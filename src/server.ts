@@ -60,15 +60,35 @@ console.log('📝 服务器名称: siyuan-mcp-server');
 console.log('🔢 版本: 1.2.3');
 console.log('🔗 传输协议: stdio');
 
-// 检查必要的环境变量
-if (!process.env.SIYUAN_TOKEN) {
-    console.error('❌ 错误: 缺少 SIYUAN_TOKEN 环境变量');
-    console.error('💡 使用方法: SIYUAN_TOKEN=your_token node server.js');
-    process.exit(1);
+// 环境变量配置
+function getEnvironmentConfig() {
+    // 尝试从多个源获取 SIYUAN_TOKEN
+    const token = process.env.SIYUAN_TOKEN ||
+        process.env.SIYUAN_API_TOKEN ||
+        process.env.SIYUAN_AUTH_TOKEN;
+
+    if (!token) {
+        console.warn('⚠️  警告: 未检测到 SIYUAN_TOKEN 环境变量');
+        console.log('💡 请通过以下方式之一设置 Token:');
+        console.log('   1. 环境变量: export SIYUAN_TOKEN=your_token');
+        console.log('   2. MCP 配置: 在客户端配置中设置 env.SIYUAN_TOKEN');
+        console.log('   3. 系统环境: 添加到系统环境变量中');
+        console.log('🔄 服务器将继续启动，但可能无法正常访问思源笔记 API');
+        return null;
+    }
+
+    return token;
 }
 
-console.log('✅ 环境变量检查通过');
-console.log('🔑 SIYUAN_TOKEN: ****' + process.env.SIYUAN_TOKEN.slice(-4));
+// 获取环境配置
+const siyuanToken = getEnvironmentConfig();
+
+if (siyuanToken) {
+    console.log('✅ 环境变量检查通过');
+    console.log('🔑 SIYUAN_TOKEN: ****' + siyuanToken.slice(-4));
+} else {
+    console.log('🟡 服务器将在有限模式下启动');
+}
 
 // 启动服务器连接
 try {

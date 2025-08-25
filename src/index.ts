@@ -72,12 +72,37 @@ export class SiyuanMcpServer {
     }
 
     /**
+     * 获取环境配置
+     */
+    private getEnvironmentConfig() {
+        // 尝试从多个源获取 SIYUAN_TOKEN
+        const token = process.env.SIYUAN_TOKEN ||
+            process.env.SIYUAN_API_TOKEN ||
+            process.env.SIYUAN_AUTH_TOKEN;
+
+        if (!token) {
+            console.warn('⚠️  警告: 未检测到 SIYUAN_TOKEN 环境变量');
+            console.log('💡 请通过以下方式之一设置 Token:');
+            console.log('   1. 环境变量: export SIYUAN_TOKEN=your_token');
+            console.log('   2. MCP 配置: 在客户端配置中设置 env.SIYUAN_TOKEN');
+            console.log('   3. 系统环境: 添加到系统环境变量中');
+            return null;
+        }
+
+        return token;
+    }
+
+    /**
      * 启动服务器
      */
     async start(): Promise<void> {
-        // 检查必要的环境变量
-        if (!process.env.SIYUAN_TOKEN) {
-            throw new Error('缺少 SIYUAN_TOKEN 环境变量。使用方法: SIYUAN_TOKEN=your_token');
+        const token = this.getEnvironmentConfig();
+
+        if (!token) {
+            console.log('🟡 服务器将在有限模式下启动（部分功能可能不可用）');
+        } else {
+            console.log('✅ 环境变量检查通过');
+            console.log('🔑 SIYUAN_TOKEN: ****' + token.slice(-4));
         }
 
         try {
@@ -114,22 +139,14 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
     console.log('🚀 启动思源笔记 MCP 服务器...');
     console.log('📝 服务器名称: siyuan-mcp-server');
-    console.log('🔢 版本: 1.2.3');
+    console.log('🔢 版本: 1.2.5');
     console.log('🔗 传输协议: stdio');
-
-    if (!process.env.SIYUAN_TOKEN) {
-        console.error('❌ 错误: 缺少 SIYUAN_TOKEN 环境变量');
-        console.error('💡 使用方法: SIYUAN_TOKEN=your_token node server.js');
-        process.exit(1);
-    }
-
-    console.log('✅ 环境变量检查通过');
-    console.log('🔑 SIYUAN_TOKEN: ****' + process.env.SIYUAN_TOKEN.slice(-4));
     console.log('🛠️  服务器已就绪，可提供思源笔记相关工具');
 
     server.start().catch((error) => {
         console.error('❌ 服务器启动失败:', error);
-        process.exit(1);
+        // 不再强制退出，让服务器尝试继续运行
+        console.log('🟡 服务器将在限制模式下继续运行...');
     });
 }
 
