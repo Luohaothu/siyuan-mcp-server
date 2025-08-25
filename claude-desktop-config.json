@@ -1,11 +1,11 @@
 {
     "siyuan-mcp-server": {
         "args": [
-            "/Users/fromsko/Desktop/Code/company/code/code_fork/frontend-monorepo/onigeya_siyuan-mcp-server/dist/server.js"
+            "@fromsko/siyuan-mcp-server"
         ],
-        "command": "node",
+        "command": "npx",
         "env": {
-            "SIYUAN_TOKEN": "aoqz8at28b6ihmxo"
+            "SIYUAN_TOKEN": "xxx"
         }
     }
 }

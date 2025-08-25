@@ -1,211 +1,337 @@
-# SiYuan Note MCP Server
-[![smithery badge](https://smithery.ai/badge/@onigeya/siyuan-mcp-server)](https://smithery.ai/server/@onigeya/siyuan-mcp-server)
+<div align="center">
+  
+  # 🧠 思源笔记 MCP 服务器
+  
+  **为 Claude Desktop 提供思源笔记集成的 Model Context Protocol 服务器**
+  
+  [![npm version](https://img.shields.io/npm/v/@fromsko/siyuan-mcp-server.svg)](https://www.npmjs.com/package/@fromsko/siyuan-mcp-server)
+  [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)](https://nodejs.org/)
+  
+  🚀 让 AI 助手直接管理您的思源笔记
+  
+</div>
 
-一个 MCP 服务器实现，提供与思源笔记系统的集成，使 AI 模型能够访问和操作笔记数据。
+---
 
-An MCP server implementation that provides integration with the SiYuan Note system, enabling AI models to access and manipulate note data.
+## 📖 项目介绍
 
-## 功能特性 | Features
+**思源笔记 MCP 服务器** 是一个专为 [思源笔记](https://b3log.org/siyuan/) 设计的 Model Context Protocol 服务器实现。通过此服务器，您可以在 Claude Desktop 等支持 MCP 的 AI 客户端中直接操作思源笔记，实现笔记管理、内容搜索、文档编辑等功能的无缝集成。
 
-* 笔记本管理 | Notebook Management
-* 文档操作 | Document Operations
-* 内容块控制 | Block Control
-* 文件和资源管理 | File and Asset Management
-* SQL 查询支持 | SQL Query Support
-* 属性管理 | Attribute Management
-* 导出和转换 | Export and Conversion
-* 系统功能 | System Functions
+### ✨ 主要特性
 
-## 命令列表 | Command List
+- 🔗 **原生集成** - 在 AI 助手中直接操作思源笔记
+- 📚 **功能完整** - 支持笔记本、文档、块级操作的全套功能
+- 🔍 **智能搜索** - 全文检索、SQL 查询、标签搜索等多种搜索方式
+- 🛠️ **开发者友好** - TypeScript 编写，提供完整的类型定义和 API 文档
+- 📦 **简单部署** - 支持 npm、Docker 多种安装方式
+- 🔒 **安全认证** - 基于 Token 的安全认证机制
 
-所有命令都支持使用 `help` 查询获取详细说明。例如：
+## 🚀 快速开始
 
-All commands support detailed documentation via the `help` command. For example:
+### 📋 环境要求
+
+- **Node.js** >= 18.0.0
+- **思源笔记** 正在运行且已开启 API 服务
+- **Claude Desktop** 或其他支持 MCP 的客户端
+- 思源笔记 API Token（设置 → 关于 → API token）
+
+### 📥 安装方式
+
+#### 1. 全局安装（推荐）
+
+```bash
+# 使用 npm
+npm install -g @fromsko/siyuan-mcp-server
+
+# 使用 pnpm
+pnpm add -g @fromsko/siyuan-mcp-server
+```
+
+#### 2. 直接使用（无需安装）
+
+```bash
+npx @fromsko/siyuan-mcp-server
+```
+
+#### 3. Docker 方式
+
+```bash
+docker pull fromsko/siyuan-mcp-server
+```
+
+### ⚙️ 快速配置
+
+#### 环境变量设置
+
+| 环境变量       | 必需 | 说明                            |
+| -------------- | ---- | ------------------------------- |
+| `SIYUAN_TOKEN` | ✅   | 思源笔记 API 令牌，用于身份验证 |
+
+#### 在 Claude Desktop 中配置
+
+在 Claude Desktop 配置文件中添加以下内容：
 
 ```json
 {
-  "type": "help",
-  "params": {
-    "type": "block.insertBlock"
-  }
+	"mcpServers": {
+		"siyuan": {
+			"command": "npx",
+			"args": ["-y", "@fromsko/siyuan-mcp-server"],
+			"env": {
+				"SIYUAN_TOKEN": "your-api-token"
+			}
+		}
+	}
 }
 ```
 
-### 资源管理 | Asset Management
+**配置文件位置：**
 
-* `assets.uploadAssets` - 上传资源文件 | Upload assets
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
-### 属性管理 | Attribute Management
-
-* `attr.setBlockAttrs` - 设置块属性 | Set block attributes
-* `attr.getBlockAttrs` - 获取块属性 | Get block attributes
-
-### 内容块操作 | Block Operations
-
-* `block.insertBlock` - 插入内容块 | Insert a block
-* `block.updateBlock` - 更新内容块 | Update block content
-* `block.deleteBlock` - 删除内容块 | Delete a block
-* `block.moveBlock` - 移动内容块 | Move a block
-* `block.getBlockKramdown` - 获取块的 Markdown 内容 | Get block Kramdown content
-
-### 格式转换 | Format Conversion
-
-* `convert.pandoc` - 使用 Pandoc 转换内容 | Convert content using Pandoc
-
-### 导出功能 | Export Functions
-
-* `export.exportNotebook` - 导出笔记本 | Export notebook
-* `export.exportDoc` - 导出文档 | Export document
-
-### 文件操作 | File Operations
-
-* `file.getFile` - 获取文件内容 | Get file content
-* `file.putFile` - 写入文件内容 | Put file content
-* `file.removeFile` - 删除文件 | Remove file
-* `file.readDir` - 读取目录内容 | List files in directory
-
-### 文档树操作 | File Tree Operations
-
-* `filetree.createDocWithMd` - 使用 Markdown 创建文档 | Create document with Markdown
-* `filetree.renameDoc` - 重命名文档 | Rename document
-* `filetree.removeDoc` - 删除文档 | Remove document
-* `filetree.moveDocs` - 移动文档 | Move documents
-* `filetree.getHPathByPath` - 获取文档可读路径 | Get document HPath by path
-* `filetree.getHPathByID` - 通过 ID 获取文档可读路径 | Get document HPath by ID
-
-### 网络代理 | Network Proxy
-
-* `network.forwardProxy` - 网络请求代理 | Forward proxy request
-
-### 笔记本管理 | Notebook Management
-
-* `notebook.lsNotebooks` - 列出所有笔记本 | List all notebooks
-* `notebook.openNotebook` - 打开笔记本 | Open notebook
-* `notebook.closeNotebook` - 关闭笔记本 | Close notebook
-* `notebook.renameNotebook` - 重命名笔记本 | Rename notebook
-* `notebook.createNotebook` - 创建笔记本 | Create notebook
-* `notebook.removeNotebook` - 删除笔记本 | Remove notebook
-* `notebook.getNotebookConf` - 获取笔记本配置 | Get notebook configuration
-* `notebook.setNotebookConf` - 设置笔记本配置 | Set notebook configuration
-
-### 通知提醒 | Notifications
-
-* `notification.pushMsg` - 发送消息通知 | Push message notification
-* `notification.pushErrMsg` - 发送错误通知 | Push error message notification
-
-### 查询功能 | Query Functions
-
-* `query.sql` - 执行 SQL 查询 | Execute SQL query
-* `query.block` - 通过 ID 查询块 | Query block by ID
-
-### 搜索功能 | Search Functions
-
-* `search.fullTextSearch` - 全文搜索 | Full text search
-
-### SQL 查询 | SQL Query
-
-* `sql.sql` - 执行 SQL 查询 | Execute SQL query
-
-### 系统功能 | System Functions
-
-* `system.getBootProgress` - 获取启动进度 | Get boot progress
-* `system.getVersion` - 获取系统版本 | Get system version
-* `system.getCurrentTime` - 获取当前时间 | Get current time
-
-### 模板功能 | Template Functions
-
-* `template.renderTemplate` - 渲染模板 | Render template
-* `template.renderSprig` - 渲染 Sprig 模板 | Render Sprig template
-
-## 使用说明 | Usage
-
-### 环境变量配置 | Environment Variables
-
-服务器需要配置以下环境变量：
-The server requires the following environment variables:
-
-* `SIYUAN_TOKEN` - 思源笔记 API 令牌（必需）| SiYuan Note API token (required)
-  * 在思源笔记设置 - 关于 中查看 | Check in SiYuan Note Settings - About
-  * 用于 API 认证 | Used for API authentication
-
-### 在 Claude Desktop 中使用 | Using in Claude Desktop
-
-将以下配置添加到 `claude_desktop_config.json`：
-Add the following configuration to `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "siyuan": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@onigeya/siyuan-mcp-server"
-      ],
-      "env": {
-        "SIYUAN_TOKEN": "your-siyuan-token"
-      }
-    }
-  }
-}
-```
-
-### 本地运行 | Local Run
-
-1. 安装依赖 | Install dependencies:
-```bash
-pnpm install
-```
-
-2. 设置环境变量 | Set environment variables:
-```bash
-# Windows
-set SIYUAN_TOKEN=your-siyuan-token
-
-# Linux/macOS
-export SIYUAN_TOKEN=your-siyuan-token
-```
-
-3. 启动服务 | Start service:
-```bash
-pnpm start
-```
-
-### Docker 运行 | Docker Run
+#### 命令行直接使用
 
 ```bash
+# 全局安装后直接使用
+SIYUAN_TOKEN=your-token siyuan-mcp-server
+
+# 使用 npx（无需安装）
+SIYUAN_TOKEN=your-token npx @fromsko/siyuan-mcp-server
+
+# Docker 运行
 docker run --rm -i \
-  -e SIYUAN_TOKEN=your-siyuan-token \
-  mcp/siyuan
+  -e SIYUAN_TOKEN=your-token \
+  fromsko/siyuan-mcp-server
 ```
 
-## 构建 | Build
+## 📚 功能与使用
 
-### 环境要求 | Requirements
+### 🔧 可用工具
 
-* Node.js >= 23.10.0
-* pnpm
+本 MCP 服务器提供以下核心功能：
 
-### 本地构建 | Local Build
+| 功能类别          | 描述                     | 主要命令     |
+| ----------------- | ------------------------ | ------------ |
+| 📓 **笔记本管理** | 创建、删除、重命名笔记本 | `notebook.*` |
+| 📄 **文档操作**   | 创建、编辑、删除文档     | `filetree.*` |
+| 🧱 **块级操作**   | 插入、更新、删除内容块   | `block.*`    |
+| 🔍 **搜索功能**   | 全文搜索、SQL 查询       | `search.*`   |
+| 📋 **模板系统**   | 模板创建和渲染           | `template.*` |
+| 📊 **数据查询**   | 复杂数据库查询           | `sql.*`      |
+
+### 💡 使用示例
+
+#### 1. 创建新笔记本
+
+```json
+{
+	"type": "executeCommand",
+	"params": {
+		"type": "notebook.createNotebook",
+		"params": {
+			"name": "AI 学习笔记"
+		}
+	}
+}
+```
+
+#### 2. 全文搜索内容
+
+```json
+{
+	"type": "executeCommand",
+	"params": {
+		"type": "search.fullTextSearch",
+		"params": {
+			"query": "机器学习",
+			"method": 0
+		}
+	}
+}
+```
+
+#### 3. 创建带内容的文档
+
+```json
+{
+	"type": "executeCommand",
+	"params": {
+		"type": "filetree.createDocWithMd",
+		"params": {
+			"notebook": "notebook-id",
+			"path": "/今日学习总结",
+			"markdown": "# 今日学习总结\n\n## 主要收获\n\n1. 学习了...\n2. 理解了..."
+		}
+	}
+}
+```
+
+### 🆘 获取帮助
+
+获取特定命令的详细帮助信息：
+
+```json
+{
+	"type": "help",
+	"params": {
+		"type": "notebook.createNotebook"
+	}
+}
+```
+
+## 🔧 开发指南
+
+### 本地开发环境搭建
 
 ```bash
+# 克隆项目
+git clone https://github.com/fromsko/siyuan-mcp-server.git
+cd siyuan-mcp-server
+
+# 安装依赖
+pnpm install
+
+# 开发模式启动
+SIYUAN_TOKEN=your-token pnpm dev
+
+# 构建生产版本
 pnpm build
+
+# 运行测试
+pnpm test
 ```
 
-### Docker 构建 | Docker Build
+### 技术栈与要求
+
+- **运行时**: Node.js >= 18.0.0
+- **语言**: TypeScript >= 5.0.0
+- **包管理**: pnpm（推荐）或 npm
+- **框架**: @modelcontextprotocol/sdk
+- **构建工具**: TypeScript Compiler
+
+### Docker 开发
 
 ```bash
-docker build -t mcp/siyuan .
+# 构建开发镜像
+docker build -t siyuan-mcp-server:dev .
+
+# 运行开发容器
+docker run --rm -it \
+  -e SIYUAN_TOKEN=your-token \
+  -v $(pwd):/app \
+  siyuan-mcp-server:dev
 ```
 
-## 许可证 | License
+## 🐛 问题排查
 
-本项目基于 ISC 许可证发布。这意味着你可以自由使用、修改和分发本软件，但需要遵守 ISC 许可证的条款和条件。详细信息请参见项目仓库中的 LICENSE 文件。
+### 常见问题解答
 
-This project is released under the ISC License. This means you can freely use, modify, and distribute this software, subject to the terms and conditions of the ISC License. For detailed information, please refer to the LICENSE file in the project repository.
+**❓ 服务器启动失败，提示"缺少 SIYUAN_TOKEN"**
 
-## 相关资源 | Related Resources
+> 请确保正确设置了 `SIYUAN_TOKEN` 环境变量。获取方式：思源笔记 → 设置 → 关于 → API token
 
-- [思源笔记 | SiYuan Note](https://github.com/siyuan-note/siyuan)
-- [Model Context Protocol](https://modelcontextprotocol.io/)
-- [思源笔记 API 文档 | SiYuan Note API Documentation](https://github.com/siyuan-note/siyuan/blob/master/API.md)
+**❓ 无法连接到思源笔记**
+
+> 请检查以下几点：
+>
+> - 思源笔记是否正在运行
+> - API 服务是否已开启（默认端口 6806）
+> - Token 是否正确且未过期
+> - 防火墙是否阻止了连接
+
+**❓ Claude Desktop 无法识别 MCP 服务器**
+
+> 请尝试以下解决方案：
+>
+> - 检查配置文件 JSON 格式是否正确
+> - 重启 Claude Desktop 应用
+> - 查看 Claude Desktop 日志获取详细错误信息
+> - 确认 npx 命令可以正常执行
+
+**❓ 命令执行失败或返回错误**
+
+> - 确认思源笔记中存在相应的笔记本或文档
+> - 检查 Token 权限是否足够
+> - 查看服务器日志获取详细错误信息
+
+### 调试模式
+
+启用详细的调试日志：
+
+```bash
+DEBUG=siyuan-mcp:* SIYUAN_TOKEN=your-token siyuan-mcp-server
+```
+
+### 日志分析
+
+服务器会输出以下类型的日志：
+
+- `INFO`: 一般信息，如服务启动、连接状态
+- `WARN`: 警告信息，如参数错误、连接异常
+- `ERROR`: 错误信息，如 API 调用失败、认证失败
+
+## 🤝 贡献指南
+
+我们热烈欢迎社区贡献！您可以通过以下方式参与：
+
+### 如何贡献
+
+1. **Fork 项目** - 点击右上角的 Fork 按钮
+2. **创建分支** - `git checkout -b feature/awesome-feature`
+3. **提交代码** - `git commit -am 'Add awesome feature'`
+4. **推送分支** - `git push origin feature/awesome-feature`
+5. **创建 PR** - 在 GitHub 上创建 Pull Request
+
+### 开发规范
+
+- **代码风格**: 遵循 TypeScript 严格模式
+- **测试覆盖**: 为新功能编写单元测试
+- **文档更新**: 更新相关的 API 文档和使用说明
+- **提交规范**: 使用清晰的 commit message
+
+### 报告问题
+
+发现 Bug 或有改进建议？请通过以下方式报告：
+
+- [GitHub Issues](https://github.com/fromsko/siyuan-mcp-server/issues)
+- 详细描述问题的复现步骤
+- 提供相关的错误日志和环境信息
+
+## 📜 开源协议
+
+本项目采用 ISC 协议开源，详情请查看 [LICENSE](LICENSE) 文件。
+
+## 🔗 相关资源
+
+### 官方链接
+
+- 📚 [思源笔记官网](https://b3log.org/siyuan/)
+- 🔗 [Model Context Protocol](https://modelcontextprotocol.io/)
+- 🤖 [Claude Desktop](https://claude.ai/download)
+- 📦 [npm 包页面](https://www.npmjs.com/package/@fromsko/siyuan-mcp-server)
+
+### 社区与支持
+
+- 💬 [思源笔记社区](https://ld246.com/domain/siyuan)
+- 🐙 [项目 GitHub](https://github.com/fromsko/siyuan-mcp-server)
+- 📧 [问题反馈](mailto:hnkong666@gmail.com)
+
+## ❤️ 特别感谢
+
+- 🌟 **原始项目作者** [onigeya](https://github.com/onigeya/siyuan-mcp-server) - 本项目基于其优秀的开源工作进行改进和扩展
+- 🙏 [思源笔记](https://github.com/siyuan-note/siyuan) 团队 - 提供优秀的笔记软件
+- 🤖 [Anthropic](https://www.anthropic.com/) - 推动 MCP 协议发展
+- 👥 所有贡献者和用户 - 让项目变得更好
+
+---
+
+<div align="center">
+  
+  **🌟 如果这个项目对您有帮助，请给我们一个 Star！**
+  
+  <strong>💻 用 TypeScript 和 ❤️ 精心构建</strong>
+  
+</div>

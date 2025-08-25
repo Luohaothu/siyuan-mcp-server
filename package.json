@@ -1,13 +1,13 @@
 {
 	"author": {
-		"name": "onigeya",
-		"url": "https://github.com/onigeya"
+		"email": "hnkong666@gmail.com",
+		"name": "Fromsko"
 	},
 	"bin": {
-		"siyuan-mcp-server": "./dist/server.js"
+		"siyuan-mcp-server": "./dist/index.js"
 	},
 	"bugs": {
-		"url": "https://github.com/onigeya/siyuan-mcp-server/issues"
+		"url": "https://github.com/fromsko/siyuan-mcp-server/issues"
 	},
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.8.0",
@@ -27,6 +27,11 @@
 	},
 	"exports": {
 		".": {
+			"default": "./dist/index.js",
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		},
+		"./server": {
 			"default": "./dist/server.js",
 			"import": "./dist/server.js",
 			"types": "./dist/server.d.ts"
@@ -42,7 +47,7 @@
 		"README.md",
 		"LICENSE"
 	],
-	"homepage": "https://github.com/onigeya/siyuan-mcp-server#readme",
+	"homepage": "https://github.com/fromsko/siyuan-mcp-server#readme",
 	"keywords": [
 		"siyuan",
 		"siyuan-note",
@@ -51,9 +56,9 @@
 		"claude"
 	],
 	"license": "ISC",
-	"main": "./dist/server.js",
-	"module": "./dist/server.js",
-	"name": "@onigeya/siyuan-mcp-server",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"name": "@fromsko/siyuan-mcp-server",
 	"packageManager": "pnpm@10.7.0",
 	"private": false,
 	"publishConfig": {
@@ -61,7 +66,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/onigeya/siyuan-mcp-server.git"
+		"url": "git+https://github.com/fromsko/siyuan-mcp-server.git"
 	},
 	"scripts": {
 		"build": "tsc",
@@ -73,6 +78,6 @@
 		"test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
 	},
 	"type": "module",
-	"types": "./dist/server.d.ts",
-	"version": "1.2.3"
+	"types": "./dist/index.d.ts",
+	"version": "1.2.4"
 }
