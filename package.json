@@ -1,75 +1,78 @@
 {
-  "name": "@onigeya/siyuan-mcp-server",
-  "version": "1.2.3",
-  "description": "思源笔记MCP服务器",
-  "type": "module",
-  "private": false,
-  "main": "./dist/server.js",
-  "module": "./dist/server.js",
-  "types": "./dist/server.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/server.d.ts",
-      "import": "./dist/server.js",
-      "default": "./dist/server.js"
-    },
-    "./tools": {
-      "types": "./dist/tools/index.d.ts",
-      "import": "./dist/tools/index.js",
-      "default": "./dist/tools/index.js"
-    }
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "node --loader ts-node/esm src/server.ts",
-    "clean": "rimraf dist",
-    "prepublishOnly": "npm run clean && npm run build",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "keywords": [
-    "siyuan",
-    "siyuan-note",
-    "mcp",
-    "model-context-protocol",
-    "claude"
-  ],
-  "author": {
-    "name": "onigeya",
-    "url": "https://github.com/onigeya"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/onigeya/siyuan-mcp-server.git"
-  },
-  "bugs": {
-    "url": "https://github.com/onigeya/siyuan-mcp-server/issues"
-  },
-  "homepage": "https://github.com/onigeya/siyuan-mcp-server#readme",
-  "license": "ISC",
-  "packageManager": "pnpm@10.7.0",
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.8.0",
-    "axios": "^1.8.4",
-    "zod": "^3.24.2"
-  },
-  "devDependencies": {
-    "@jest/globals": "^29.7.0",
-    "@types/jest": "^29.5.12",
-    "@types/node": "^22.13.14",
-    "jest": "^29.7.0",
-    "rimraf": "^6.0.1",
-    "ts-jest": "^29.1.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
-  }
+	"author": {
+		"name": "onigeya",
+		"url": "https://github.com/onigeya"
+	},
+	"bin": {
+		"siyuan-mcp-server": "./dist/server.js"
+	},
+	"bugs": {
+		"url": "https://github.com/onigeya/siyuan-mcp-server/issues"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.8.0",
+		"axios": "^1.8.4",
+		"zod": "^3.24.2"
+	},
+	"description": "思源笔记MCP服务器",
+	"devDependencies": {
+		"@jest/globals": "^29.7.0",
+		"@types/jest": "^29.5.12",
+		"@types/node": "^22.13.14",
+		"jest": "^29.7.0",
+		"rimraf": "^6.0.1",
+		"ts-jest": "^29.1.2",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.8.2"
+	},
+	"exports": {
+		".": {
+			"default": "./dist/server.js",
+			"import": "./dist/server.js",
+			"types": "./dist/server.d.ts"
+		},
+		"./tools": {
+			"default": "./dist/tools/index.js",
+			"import": "./dist/tools/index.js",
+			"types": "./dist/tools/index.d.ts"
+		}
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"homepage": "https://github.com/onigeya/siyuan-mcp-server#readme",
+	"keywords": [
+		"siyuan",
+		"siyuan-note",
+		"mcp",
+		"model-context-protocol",
+		"claude"
+	],
+	"license": "ISC",
+	"main": "./dist/server.js",
+	"module": "./dist/server.js",
+	"name": "@onigeya/siyuan-mcp-server",
+	"packageManager": "pnpm@10.7.0",
+	"private": false,
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/onigeya/siyuan-mcp-server.git"
+	},
+	"scripts": {
+		"build": "tsc",
+		"clean": "rimraf dist",
+		"dev": "node --loader ts-node/esm src/server.ts",
+		"prepublishOnly": "npm run clean && npm run build",
+		"start": "node dist/server.js",
+		"test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+		"test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
+	},
+	"type": "module",
+	"types": "./dist/server.d.ts",
+	"version": "1.2.3"
 }
