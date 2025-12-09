@@ -19,7 +19,8 @@ COPY . .
 # Build the project
 RUN pnpm run build
 
-# Expose any necessary port if applicable (none specified for this MCP)
+# Expose HTTP port for remote MCP (SSE)
+EXPOSE 3001
 
 # Define default command
 CMD ["node", "dist/server.js"]

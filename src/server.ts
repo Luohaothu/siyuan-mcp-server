@@ -1,6 +1,7 @@
 #!/usr/bin/env node
+import express, { Request, Response } from 'express';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
 import { registerCommandTool } from './tools/commands.js';
 import { registerAssetsHandlers } from './tools/commands/assets.js';
 import { registerAttrHandlers } from './tools/commands/attr.js';
@@ -20,49 +21,39 @@ import { registerTemplateHandlers } from './tools/commands/template.js';
 import { registerHelpTool } from './tools/help.js';
 import { registerQueryTool } from './tools/queries.js';
 
-// 创建 MCP 服务器实例
-const server = new McpServer({
-    name: "siyuan-mcp-server",
-    version: "1.0.0",
-    capabilities: {
-        tools: {},
-    },
-});
+function createServer() {
+    const server = new McpServer({
+        name: "siyuan-mcp-server",
+        version: "1.2.7"
+    });
 
-// 创建传输层实例
-const transport = new StdioServerTransport();
+    // 注册命令处理器
+    registerNotebookHandlers();
+    registerFiletreeHandlers();
+    registerBlockHandlers();
+    registerAttrHandlers();
+    registerSqlHandlers();
+    registerQueryHandlers();
+    registerSearchHandlers();
+    registerAssetsHandlers();
+    registerFileHandlers();
+    registerExportHandlers();
+    registerTemplateHandlers();
+    registerNotificationHandlers();
+    registerSystemHandlers();
+    registerConvertHandlers();
+    registerNetworkHandlers();
 
-// 注册命令处理器
-registerNotebookHandlers();
-registerFiletreeHandlers();
-registerBlockHandlers();
-registerAttrHandlers();
-registerSqlHandlers();
-registerQueryHandlers();
-registerSearchHandlers();
-registerAssetsHandlers();
-registerFileHandlers();
-registerExportHandlers();
-registerTemplateHandlers();
-registerNotificationHandlers();
-registerSystemHandlers();
-registerConvertHandlers();
-registerNetworkHandlers();
+    // 注册工具
+    registerCommandTool(server);
+    registerQueryTool(server);
+    registerHelpTool(server);
 
-// 注册工具
-registerCommandTool(server);
-registerQueryTool(server);
-registerHelpTool(server);
-
-// 启动服务器
-console.log('🚀 启动思源笔记 MCP 服务器...');
-console.log('📝 服务器名称: siyuan-mcp-server');
-console.log('🔢 版本: 1.2.3');
-console.log('🔗 传输协议: stdio');
+    return server;
+}
 
 // 环境变量配置
 function getEnvironmentConfig() {
-    // 尝试从多个源获取 SIYUAN_TOKEN
     const token = process.env.SIYUAN_TOKEN ||
         process.env.SIYUAN_API_TOKEN ||
         process.env.SIYUAN_AUTH_TOKEN;
@@ -80,7 +71,43 @@ function getEnvironmentConfig() {
     return token;
 }
 
-// 获取环境配置
+const port = Number(process.env.PORT) || 3001;
+const server = createServer();
+const app = express();
+app.use(express.json({ limit: '1mb' }));
+
+// 用 sessionId 保存多个连接的 transport
+const transports: Record<string, SSEServerTransport> = {};
+
+app.get('/sse', async (_: Request, res: Response) => {
+    const transport = new SSEServerTransport('/messages', res);
+    transports[transport.sessionId] = transport;
+    res.on('close', () => {
+        delete transports[transport.sessionId];
+    });
+    await server.connect(transport);
+});
+
+app.post('/messages', async (req: Request, res: Response) => {
+    const sessionId = req.query.sessionId as string;
+    const transport = transports[sessionId];
+    if (!transport) {
+        res.status(400).send('No transport found for sessionId');
+        return;
+    }
+    await transport.handlePostMessage(req, res, req.body);
+});
+
+app.get('/', (_req, res) => {
+    res.json({
+        status: 'ok',
+        name: 'siyuan-mcp-server',
+        transport: 'sse',
+        sse: '/sse',
+        messages: '/messages'
+    });
+});
+
 const siyuanToken = getEnvironmentConfig();
 
 if (siyuanToken) {
@@ -90,15 +117,13 @@ if (siyuanToken) {
     console.log('🟡 服务器将在有限模式下启动');
 }
 
-// 启动服务器连接
-try {
-    server.connect(transport);
-    console.log('🎉 MCP 服务器启动成功!');
-    console.log('📡 等待客户端连接...');
-    console.log('🛠️  服务器已就绪，可提供思源笔记相关工具');
-} catch (error) {
-    console.error('❌ 服务器启动失败:', error);
-    process.exit(1);
-}
+app.listen(port, () => {
+    console.log('🚀 启动思源笔记 MCP 服务器...');
+    console.log('📝 服务器名称: siyuan-mcp-server');
+    console.log('🔢 版本: 1.2.7');
+    console.log('🔗 传输协议: HTTP + SSE');
+    console.log(`📡 SSE 地址: http://0.0.0.0:${port}/sse`);
+    console.log(`📨 消息上行地址: http://0.0.0.0:${port}/messages`);
+});
 
 export { server };

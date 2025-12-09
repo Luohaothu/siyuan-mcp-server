@@ -105,6 +105,39 @@ SIYUAN_TOKEN=your-token npx @fromsko/siyuan-mcp-server
 docker run --rm -i \
   -e SIYUAN_TOKEN=your-token \
   fromsko/siyuan-mcp-server
+
+# 以远程 MCP (HTTP + SSE) 方式运行
+docker run -d --name siyuan-mcp-server \
+  -p 3001:3001 \
+  -e SIYUAN_TOKEN=your-token \
+  -e SIYUAN_API_URL=http://host.docker.internal:6806 \
+  fromsko/siyuan-mcp-server
+
+# 远程客户端配置要点
+# SSE 地址:    http://<host>:3001/sse
+# 消息 POST:   http://<host>:3001/messages?sessionId=<从 /sse 事件里拿到的 sessionId>
+# 若宿主启用了代理，请为 3001 关闭代理（如 curl 加 --noproxy '*'）
+```
+
+远程调试/自测示例（获取 sessionId 并列出笔记本）：
+```bash
+# 1) 取 sessionId
+curl -Ns --no-buffer --noproxy '*' http://<host>:3001/sse
+# 输出中的 data: /messages?sessionId=xxxx
+
+# 2) 发送命令（列出笔记本）
+SESSION=xxxx
+curl --noproxy '*' -X POST "http://<host>:3001/messages?sessionId=$SESSION" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "jsonrpc":"2.0",
+    "id":"1",
+    "method":"tools/call",
+    "params":{
+      "name":"executeCommand",
+      "arguments":{"type":"notebook.lsNotebooks","params":{}}
+    }
+  }'
 ```
 
 ## 📚 功能与使用
